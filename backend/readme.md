@@ -1,3 +1,4 @@
+```
 src/
 ├── @types/             # Definições de tipos globais (ex: extensões do Express)
 ├── config/             # Configurações globais (banco de dados, variáveis de ambiente)
@@ -19,5 +20,6 @@ src/
 │   └── container/      # Injeção de dependência (se optar por usar)
 ├── app.ts              # Configuração do Express
 └── server.ts           # Inicialização do servidor
+```
 
 docker run --name meu-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=123123 -e POSTGRES_DB=database -p 5432:5432 -d postgres
