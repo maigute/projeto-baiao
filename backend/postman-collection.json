@@ -1,0 +1,397 @@
+{
+  "info": {
+    "name": "Trabaalho Prático - Backend",
+    "description": "Coleção da API: autenticação (JWT) e CRUD de Users, Products, ProductCategory, ProductSituation e Situation.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health",
+            "description": "Verifica se a API está no ar."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.token) pm.collectionVariables.set('token', json.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"usuario@email.com\",\n  \"password\": \"senha123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/login",
+            "description": "Gera o token JWT. O token é salvo automaticamente na variável da coleção."
+          }
+        },
+        {
+          "name": "Me (usuário logado)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/users/me",
+            "description": "Retorna os dados do usuário autenticado."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/users/logout",
+            "description": "Logout (client-side: descarte o token após esta chamada)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"novo@email.com\",\n  \"password\": \"senha123\",\n  \"situationId\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/users",
+            "description": "Cria um novo usuário (senha é hasheada no backend)."
+          }
+        },
+        {
+          "name": "List All Users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/users",
+            "description": "Lista todos os usuários (com Situation incluída)."
+          }
+        },
+        {
+          "name": "Get User by Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/users/1",
+            "description": "Busca usuário por ID (com Situation incluída)."
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"atualizado@email.com\",\n  \"situationId\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/users/1",
+            "description": "Atualiza usuário por ID. Inclua 'password' apenas se for alterar a senha."
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/users/1",
+            "description": "Remove usuário por ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Produto Exemplo\",\n  \"productCategoryId\": 1,\n  \"productSituationId\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/products",
+            "description": "Cria um novo produto."
+          }
+        },
+        {
+          "name": "List All Products",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/products",
+            "description": "Lista todos os produtos (com category e situation incluídos)."
+          }
+        },
+        {
+          "name": "Get Product by Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/products/1",
+            "description": "Busca produto por ID (com category e situation incluídos)."
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Produto Atualizado\",\n  \"productCategoryId\": 1,\n  \"productSituationId\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/products/1",
+            "description": "Atualiza produto por ID."
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/products/1",
+            "description": "Remove produto por ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Product Categories",
+      "item": [
+        {
+          "name": "Create Product Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Eletrônicos\"\n}"
+            },
+            "url": "{{baseUrl}}/api/product-categories",
+            "description": "Cria uma nova categoria de produto."
+          }
+        },
+        {
+          "name": "List All Product Categories",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/product-categories",
+            "description": "Lista todas as categorias de produto."
+          }
+        },
+        {
+          "name": "Get Product Category by Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/product-categories/1",
+            "description": "Busca categoria de produto por ID."
+          }
+        },
+        {
+          "name": "Update Product Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Eletrônicos e Gadgets\"\n}"
+            },
+            "url": "{{baseUrl}}/api/product-categories/1",
+            "description": "Atualiza categoria de produto por ID."
+          }
+        },
+        {
+          "name": "Delete Product Category",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/product-categories/1",
+            "description": "Remove categoria de produto por ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Product Situations",
+      "item": [
+        {
+          "name": "Create Product Situation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ativo\"\n}"
+            },
+            "url": "{{baseUrl}}/api/product-situations",
+            "description": "Cria uma nova situação de produto (ex: Ativo, Fora de Linha)."
+          }
+        },
+        {
+          "name": "List All Product Situations",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/product-situations",
+            "description": "Lista todas as situações de produto."
+          }
+        },
+        {
+          "name": "Get Product Situation by Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/product-situations/1",
+            "description": "Busca situação de produto por ID."
+          }
+        },
+        {
+          "name": "Update Product Situation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fora de Linha\"\n}"
+            },
+            "url": "{{baseUrl}}/api/product-situations/1",
+            "description": "Atualiza situação de produto por ID."
+          }
+        },
+        {
+          "name": "Delete Product Situation",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/product-situations/1",
+            "description": "Remove situação de produto por ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Situations",
+      "item": [
+        {
+          "name": "Create Situation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ativo\"\n}"
+            },
+            "url": "{{baseUrl}}/api/situations",
+            "description": "Cria uma nova situação (status global: ex. Ativo, Pendente para usuários)."
+          }
+        },
+        {
+          "name": "List All Situations",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/situations",
+            "description": "Lista todas as situações."
+          }
+        },
+        {
+          "name": "Get Situation by Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/situations/1",
+            "description": "Busca situação por ID."
+          }
+        },
+        {
+          "name": "Update Situation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pendente\"\n}"
+            },
+            "url": "{{baseUrl}}/api/situations/1",
+            "description": "Atualiza situação por ID."
+          }
+        },
+        {
+          "name": "Delete Situation",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/api/situations/1",
+            "description": "Remove situação por ID."
+          }
+        }
+      ]
+    }
+  ]
+}

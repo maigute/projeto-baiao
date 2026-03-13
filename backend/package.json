@@ -1,31 +1,36 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Esta API foi projetada para fornecer uma interface escalável e segura para a gestão de produtos, categorias e controle de acesso de usuários, utilizando as melhores práticas de desenvolvimento com **Node.js** e **TypeScript**.",
+  "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:seed": "cd src/config && npx sequelize-cli db:seed:all",
+    "db:seed:undo": "cd src/config && npx sequelize-cli db:seed:undo",
+    "db:seed:undo:all": "cd src/config && npx sequelize-cli db:seed:undo:all"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "cors": "^2.8.6",
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.8"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.19",
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
-    "@types/node": "^25.3.3",
-    "@types/validator": "^13.15.10",
-    "rimraf": "^6.1.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.5.0",
+    "sequelize-cli": "^6.6.5",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   }
