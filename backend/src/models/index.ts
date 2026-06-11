@@ -4,6 +4,7 @@ import { Product } from './Product';
 import { ProductCategory } from './ProductCategory';
 import { ProductSituation } from './ProductSituation';
 import { Situation } from './Situation';
+import { PasswordResetToken } from './PasswordResetToken';
 
 // User ↔ Situation
 User.belongsTo(Situation, {
@@ -14,6 +15,17 @@ User.belongsTo(Situation, {
 Situation.hasMany(User, {
   foreignKey: 'situationId',
   as: 'users',
+});
+
+// User ↔ PasswordResetToken
+User.hasMany(PasswordResetToken, {
+  foreignKey: 'userId',
+  as: 'passwordResetTokens',
+});
+
+PasswordResetToken.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user',
 });
 
 // Product ↔ ProductCategory
@@ -38,4 +50,12 @@ ProductSituation.hasMany(Product, {
   as: 'products',
 });
 
-export { sequelize, User, Product, ProductCategory, ProductSituation, Situation };
+export {
+  sequelize,
+  User,
+  PasswordResetToken,
+  Product,
+  ProductCategory,
+  ProductSituation,
+  Situation,
+};

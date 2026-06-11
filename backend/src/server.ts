@@ -21,7 +21,7 @@ async function start() {
     console.log('Database connection has been established successfully.');
 
     console.log('Synchronizing models with database...');
-    await sequelize.sync();
+    await sequelize.sync({ alter: true});
     console.log('Models synchronized successfully.');
 
     app.listen(PORT, () => {

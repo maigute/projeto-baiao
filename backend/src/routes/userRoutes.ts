@@ -6,6 +6,8 @@ export const userRouter = Router();
 
 // Rotas públicas
 userRouter.post('/login', UserController.login);
+userRouter.post('/recovery-password', UserController.recoveryPassword);
+userRouter.post('/set-new-password/:uuid', UserController.setNewPassword);
 
 // A partir daqui, todas as rotas exigem JWT
 userRouter.use(authenticate);

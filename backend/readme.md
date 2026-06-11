@@ -92,6 +92,63 @@ Todos os módulos abaixo seguem o padrão RESTful para as entidades: `User`, `Pr
 3. **Tratamento de Erros:** A API deve retornar status codes semânticos (Ex: `401 Unauthorized` para falha de login, `404 Not Found` para IDs inexistentes).
 4. **Validação:** Uso de interfaces TypeScript para garantir que o corpo das requisições (`req.body`) contenha todos os campos obrigatórios.
 
+---
+
+## 📋 Patch Notes
+
+### v1.1.0 — Recuperação de senha (Jun/2026)
+
+Implementação do fluxo de recuperação de senha com envio de código por e-mail via **Nodemailer** e **Mailtrap**.
+
+#### Novos endpoints (públicos)
+
+| Método | Endpoint | Descrição |
+| --- | --- | --- |
+| `POST` | `/api/users/recovery-password` | Recebe o e-mail do usuário, envia código OTP de 6 dígitos por e-mail e retorna um `uuid` para identificar a solicitação. |
+| `POST` | `/api/users/set-new-password/:uuid` | Recebe o código (do e-mail) e a nova senha; valida e atualiza a senha do usuário. |
+
+#### Fluxo de uso
+
+1. Cliente chama `POST /api/users/recovery-password` com `{ "email": "usuario@email.com" }`.
+2. Se o e-mail estiver cadastrado, a API envia um código de 6 dígitos (válido por **15 minutos**) e retorna `{ "uuid": "...", "message": "..." }`.
+3. Cliente chama `POST /api/users/set-new-password/:uuid` com `{ "code": "123456", "password": "novaSenha123" }`.
+4. Senha atualizada com sucesso; o token de recuperação é invalidado após o uso.
+
+#### Arquivos adicionados
+
+* `src/models/PasswordResetToken.ts` — persistência dos tokens de recuperação (`password_reset_tokens`).
+* `src/interfaces/PasswordResetToken.ts`
+* `src/services/EmailService.ts` — envio de e-mails via SMTP (Mailtrap).
+* `src/services/PasswordRecoveryService.ts` — lógica de solicitação e redefinição de senha.
+
+#### Dependências
+
+* `nodemailer` — envio de e-mails.
+* `uuid` — geração do identificador único da solicitação (`uuid` v4).
+
+#### Variáveis de ambiente
+
+```env
+MAILTRAP_HOST=sandbox.smtp.mailtrap.io
+MAILTRAP_PORT=2525
+MAILTRAP_USER=<usuario-smtp-do-mailtrap>
+MAILTRAP_PASS=<senha-ou-token-smtp>
+MAIL_FROM=Projeto Baiao <noreply@projeto-baiao.local>
+```
+
+#### Segurança
+
+* Código OTP armazenado com hash (`bcrypt`), assim como a senha do usuário.
+* Resposta genérica quando o e-mail não existe (não revela se a conta está cadastrada).
+* Tokens anteriores do mesmo usuário são invalidados ao criar uma nova solicitação ou ao concluir o reset.
+* Nova senha exige no mínimo **8 caracteres**.
+
+#### Postman
+
+Os requests **Recovery Password** e **Set New Password** foram adicionados à pasta **Auth** em `postman-collection.json`. A variável `recoveryUuid` é preenchida automaticamente após a solicitação de recuperação.
+
+---
+
 ## Conteiner docker
 
 ```

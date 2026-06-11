@@ -1,12 +1,13 @@
 {
   "info": {
     "name": "Trabaalho Prático - Backend",
-    "description": "Coleção da API: autenticação (JWT) e CRUD de Users, Products, ProductCategory, ProductSituation e Situation.",
+    "description": "Coleção da API: autenticação (JWT), recuperação de senha e CRUD de Users, Products, ProductCategory, ProductSituation e Situation.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3000" },
-    { "key": "token", "value": "" }
+    { "key": "token", "value": "" },
+    { "key": "recoveryUuid", "value": "" }
   ],
   "item": [
     {
@@ -51,6 +52,46 @@
             },
             "url": "{{baseUrl}}/api/users/login",
             "description": "Gera o token JWT. O token é salvo automaticamente na variável da coleção."
+          }
+        },
+        {
+          "name": "Recovery Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  if (json.uuid) pm.collectionVariables.set('recoveryUuid', json.uuid);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"usuario@email.com\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/recovery-password",
+            "description": "Solicita recuperação de senha. Envia um código de 6 dígitos por e-mail (Mailtrap). Retorna uuid para o próximo passo. O uuid é salvo automaticamente na variável da coleção."
+          }
+        },
+        {
+          "name": "Set New Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"123456\",\n  \"password\": \"novaSenha123\"\n}"
+            },
+            "url": "{{baseUrl}}/api/users/set-new-password/{{recoveryUuid}}",
+            "description": "Define nova senha usando o uuid retornado em Recovery Password e o código recebido por e-mail. Senha mínima: 8 caracteres. Código expira em 15 minutos."
           }
         },
         {

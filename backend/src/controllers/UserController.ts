@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { UserServices } from '../services/UserServices';
+import { PasswordRecoveryService } from '../services/PasswordRecoveryService';
 
 type AuthenticatedRequest = Request & { userId?: number };
 
@@ -76,6 +77,55 @@ export class UserController {
       return res.status(204).send();
     } catch {
       return res.status(500).json({ message: 'Failed to delete user' });
+    }
+  }
+
+  static async recoveryPassword(req: Request, res: Response): Promise<Response> {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
+
+      const result = await PasswordRecoveryService.requestRecovery(email);
+      return res.status(200).json(result);
+    } catch (error: any) {
+      if (error.message === 'Mailtrap credentials are not configured') {
+        return res.status(500).json({ message: 'Email service is not configured' });
+      }
+      return res.status(500).json({ message: 'Failed to request password recovery' });
+    }
+  }
+
+  static async setNewPassword(req: Request, res: Response): Promise<Response> {
+    try {
+      const uuid = String(req.params.uuid ?? '');
+      const { code, password } = req.body;
+
+      if (!uuid) {
+        return res.status(400).json({ message: 'Recovery uuid is required' });
+      }
+
+      await PasswordRecoveryService.setNewPassword(uuid, code, password);
+      return res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error: any) {
+      const clientErrors = [
+        'Code and password are required',
+        'Password must be at least 8 characters',
+        'Recovery code already used',
+        'Recovery code expired',
+        'Invalid recovery code',
+      ];
+
+      if (clientErrors.includes(error.message)) {
+        return res.status(400).json({ message: error.message });
+      }
+
+      if (error.message === 'Recovery request not found') {
+        return res.status(404).json({ message: error.message });
+      }
+
+      return res.status(500).json({ message: 'Failed to update password' });
     }
   }
 
